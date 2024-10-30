@@ -47,7 +47,7 @@ export default function Component() {
     }
   }
 
-  // Get current results for pagination
+  // Get current result for pagination
   const indexOfLastResult = currentPage * resultsPerPage
   const indexOfFirstResult = indexOfLastResult - resultsPerPage
   const currentResults = results.slice(indexOfFirstResult, indexOfLastResult)
