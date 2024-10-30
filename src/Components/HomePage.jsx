@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Search, Mic } from 'lucide-react'
 
-export default function Component() {
+export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [platform, setPlatform] = useState('both')
   const [results, setResults] = useState([])
