@@ -1,5 +1,5 @@
 "use client"
-import HomePage from "../components/HomePage";
+import HomePage from "../components/HomePage.js";
 
 export default function Home() {
   return (
