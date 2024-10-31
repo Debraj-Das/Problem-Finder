@@ -28,6 +28,8 @@ export default function HomePage() {
         url = "https://problemfinderapi.onrender.com/codeforce";
       } else if (newPlatform === "atcoder") {
         url = "https://problemfinderapi.onrender.com/atcoder";
+      } else if (newPlatform === "dmoj") {
+        url = "https://problemfinderapi.onrender.com/dmoj";
       }
 
       if (searchQuery) {
@@ -159,6 +161,7 @@ export default function HomePage() {
           <option value="leetcode">LeetCode</option>
           <option value="codeforces">CodeForces</option>
           <option value="atcoder">AtCoder</option>
+          <option value="dmoj">DMOJ</option>
         </select>
       </div>
 
