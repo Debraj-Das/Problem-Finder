@@ -1,106 +1,111 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Search, Mic } from 'lucide-react'
+import { Mic, Search } from "lucide-react";
+import { useState } from "react";
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [platform, setPlatform] = useState('both')
-  const [results, setResults] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [isListening, setIsListening] = useState(false)
-  const resultsPerPage = 10
+  const [searchQuery, setSearchQuery] = useState("");
+  const [platform, setPlatform] = useState("both");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isListening, setIsListening] = useState(false);
+  const resultsPerPage = 10;
 
-  
-
-  const handleSearch = async (e, newPlatform = platform) => {       
-    if(e) e.preventDefault()
-    setLoading(true)
-    setError(null)
-    setCurrentPage(1) // Reset to first page on new search
+  const handleSearch = async (e, newPlatform = platform) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setCurrentPage(1); // Reset to first page on new search
 
     try {
-      let url = 'https://problemfinderapi.onrender.com/'
-      
-      if (newPlatform === 'leetcode') {
-        url = 'https://problemfinderapi.onrender.com/leetcode'
-      } else if (newPlatform === 'codeforces') {
-        url = 'https://problemfinderapi.onrender.com/codeforce'
+      let url = "https://problemfinderapi.onrender.com/";
+
+      if (newPlatform === "leetcode") {
+        url = "https://problemfinderapi.onrender.com/leetcode";
+      } else if (newPlatform === "codeforces") {
+        url = "https://problemfinderapi.onrender.com/codeforce";
+      } else if (newPlatform === "atcoder") {
+        url = "https://problemfinderapi.onrender.com/atcoder";
       }
 
       if (searchQuery) {
-        url += `?q=${encodeURIComponent(searchQuery)}`
+        url += `?q=${encodeURIComponent(searchQuery)}`;
       }
 
-      const response = await fetch(url)
+      const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json()
+      const data = await response.json();
       // Check if data is an array before sorting
-      const sortedResults = Array.isArray(data) ? data.sort((a, b) => b.score - a.score) : []
-      setResults(sortedResults)
+      const sortedResults = Array.isArray(data)
+        ? data.sort((a, b) => b.score - a.score)
+        : [];
+      setResults(sortedResults);
     } catch (error) {
-      setError(error.message || 'Failed to fetch results. Please try again later.')
-      setResults([])
+      setError(
+        error.message || "Failed to fetch results. Please try again later."
+      );
+      setResults([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVoiceSearch = () => {
-    if (!('webkitSpeechRecognition' in window)) {
-      setError('Voice recognition is not supported in your browser')
-      return
+    if (!("webkitSpeechRecognition" in window)) {
+      setError("Voice recognition is not supported in your browser");
+      return;
     }
 
-    const recognition = new webkitSpeechRecognition()
-    recognition.continuous = false
-    recognition.interimResults = false
-    recognition.lang = 'en-US'
+    const recognition = new webkitSpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
 
     recognition.onstart = () => {
-      setIsListening(true)
-    }
+      setIsListening(true);
+    };
 
     recognition.onend = () => {
-      setIsListening(false)
-    }
+      setIsListening(false);
+    };
 
     recognition.onresult = async (event) => {
-      const transcript = event.results[0][0].transcript
-      setSearchQuery(transcript)
+      const transcript = event.results[0][0].transcript;
+      setSearchQuery(transcript);
       // Trigger search with voice input after setting the search query
-      setTimeout(() => handleSearch(null), 0) // Use setTimeout to ensure searchQuery is updated
-    }
+      setTimeout(() => handleSearch(null), 0); // Use setTimeout to ensure searchQuery is updated
+    };
 
     recognition.onerror = (event) => {
-      setError('Error occurred in voice recognition: ' + event.error)
-      setIsListening(false)
-    }
+      setError("Error occurred in voice recognition: " + event.error);
+      setIsListening(false);
+    };
 
-    recognition.start()
-  }
+    recognition.start();
+  };
 
   // Get current result for pagination
-  const indexOfLastResult = currentPage * resultsPerPage
-  const indexOfFirstResult = indexOfLastResult - resultsPerPage
-  const currentResults = results.slice(indexOfFirstResult, indexOfLastResult)
-  const totalPages = Math.ceil(results.length / resultsPerPage)
+  const indexOfLastResult = currentPage * resultsPerPage;
+  const indexOfFirstResult = indexOfLastResult - resultsPerPage;
+  const currentResults = results.slice(indexOfFirstResult, indexOfLastResult);
+  const totalPages = Math.ceil(results.length / resultsPerPage);
 
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Handle platform change
   const handlePlatformChange = (e) => {
-    const newPlatform = e.target.value
-    setPlatform(newPlatform)
-    if (searchQuery) { // Only trigger search if there's a query
-      handleSearch(null, newPlatform)
+    const newPlatform = e.target.value;
+    setPlatform(newPlatform);
+    if (searchQuery) {
+      // Only trigger search if there's a query
+      handleSearch(null, newPlatform);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center pt-8 sm:pt-14 bg-gray-50 px-4">
@@ -133,7 +138,11 @@ export default function HomePage() {
               onClick={handleVoiceSearch}
               className="focus:outline-none"
             >
-              <Mic className={`${isListening ? 'text-red-500 animate-pulse' : 'text-blue-500'} ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 cursor-pointer`} />
+              <Mic
+                className={`${
+                  isListening ? "text-red-500 animate-pulse" : "text-blue-500"
+                } ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 cursor-pointer`}
+              />
             </button>
           </div>
         </form>
@@ -149,15 +158,20 @@ export default function HomePage() {
           <option value="both">All</option>
           <option value="leetcode">LeetCode</option>
           <option value="codeforces">CodeForces</option>
+          <option value="atcoder">AtCoder</option>
         </select>
       </div>
 
       {loading && (
-        <div className="mt-6 sm:mt-8 text-gray-600 text-sm sm:text-base">Loading...</div>
+        <div className="mt-6 sm:mt-8 text-gray-600 text-sm sm:text-base">
+          Loading...
+        </div>
       )}
 
       {error && (
-        <div className="mt-6 sm:mt-8 text-red-500 text-sm sm:text-base">{error}</div>
+        <div className="mt-6 sm:mt-8 text-red-500 text-sm sm:text-base">
+          {error}
+        </div>
       )}
 
       {!loading && !error && results.length > 0 && (
@@ -165,54 +179,68 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
             <div className="space-y-3 sm:space-y-4">
               {currentResults.slice(0, 5).map((result, index) => (
-                <div key={index} className="bg-white p-2 sm:p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+                <div
+                  key={index}
+                  className="bg-white p-2 sm:p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-blue-500"
+                >
                   <div className="flex justify-between items-start">
-                    <a 
-                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors" 
+                    <a
+                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors"
                       href={result.url}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {result.name}
-                    </a>                   
-                  </div>                
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
             <div className="space-y-3 sm:space-y-4">
               {currentResults.slice(5, 10).map((result, index) => (
-                <div key={index + 5} className="bg-white p-2 sm:p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-blue-500">
+                <div
+                  key={index + 5}
+                  className="bg-white p-2 sm:p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-blue-500"
+                >
                   <div className="flex justify-between items-start">
-                    <a 
-                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors" 
+                    <a
+                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors"
                       href={result.url}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       {result.name}
-                    </a>                   
+                    </a>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          
+
           {/* Pagination */}
           <div className="flex justify-center items-center mt-6 space-x-2">
-            <button 
+            <button
               onClick={() => paginate(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md transition-colors text-sm sm:text-base ${currentPage === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md transition-colors text-sm sm:text-base ${
+                currentPage === 1
+                  ? "bg-gray-200 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
             >
               Previous
             </button>
             <span className="text-gray-600 bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-md border text-sm sm:text-base">
               Page {currentPage} of {totalPages}
             </span>
-            <button 
+            <button
               onClick={() => paginate(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md transition-colors text-sm sm:text-base ${currentPage === totalPages ? 'bg-gray-200 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-md transition-colors text-sm sm:text-base ${
+                currentPage === totalPages
+                  ? "bg-gray-200 cursor-not-allowed"
+                  : "bg-blue-500 text-white hover:bg-blue-600"
+              }`}
             >
               Next
             </button>
@@ -220,5 +248,5 @@ export default function HomePage() {
         </div>
       )}
     </div>
-  )
+  );
 }
