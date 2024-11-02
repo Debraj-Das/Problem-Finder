@@ -15,9 +15,13 @@ export default function HomePage() {
 
   const handleSearch = async (e, newPlatform = platform) => {
     if (e) e.preventDefault();
+    if (!searchQuery) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
-    setCurrentPage(1); // Reset to first page on new search
+    setCurrentPage(1);
 
     try {
       let url = "https://problemfinderapi.onrender.com/";
@@ -78,8 +82,7 @@ export default function HomePage() {
     recognition.onresult = async (event) => {
       const transcript = event.results[0][0].transcript;
       setSearchQuery(transcript);
-      // Trigger search with voice input after setting the search query
-      setTimeout(() => handleSearch(null), 0); // Use setTimeout to ensure searchQuery is updated
+      setTimeout(() => handleSearch(null), 0);
     };
 
     recognition.onerror = (event) => {
@@ -109,6 +112,11 @@ export default function HomePage() {
     }
   };
 
+  const clearSearch = () => {
+    setSearchQuery("");
+    document.querySelector("input").focus();
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center pt-8 sm:pt-14 bg-gray-50 px-4">
       <div className="text-center mb-6 sm:mb-8">
@@ -135,6 +143,24 @@ export default function HomePage() {
               placeholder="Search coding problems"
               className="flex-1 outline-none text-gray-700 text-sm sm:text-base"
             />
+
+            {searchQuery && (
+              <button
+                type="button"
+                className="focus:outline-none"
+                onClick={clearSearch}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 text-gray-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                </svg>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={handleVoiceSearch}
@@ -143,6 +169,17 @@ export default function HomePage() {
               <Mic
                 className={`${
                   isListening ? "text-red-500 animate-pulse" : "text-blue-500"
+                } ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 cursor-pointer`}
+              />
+            </button>
+            <button
+              type="submit"
+              className="focus:outline-none"
+              onClick={handleSearch}
+            >
+              <Search
+                className={`${
+                  searchQuery ? "text-blue-500" : "text-gray-500"
                 } ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5 cursor-pointer`}
               />
             </button>
@@ -188,7 +225,7 @@ export default function HomePage() {
                 >
                   <div className="flex justify-between items-start">
                     <a
-                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors"
+                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors truncate"
                       href={result.url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -207,7 +244,7 @@ export default function HomePage() {
                 >
                   <div className="flex justify-between items-start">
                     <a
-                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors"
+                      className="font-semibold text-base sm:text-lg text-gray-800 hover:text-blue-600 transition-colors truncate"
                       href={result.url}
                       target="_blank"
                       rel="noopener noreferrer"
