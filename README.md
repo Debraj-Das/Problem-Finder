@@ -1,3 +1,9 @@
+## It Backend/Server Side of the project
+
+[GitHub](https://github.com/Debraj-Das/problemFinderApi)  
+[Backend Live Link](problemfinderapi.onrender.com/docs)  
+[Live Link](problem-finder.vercel.app)
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
